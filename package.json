@@ -6,6 +6,7 @@
   "scripts": {
     "start": "cd ./dist && node ./index.js",
     "debug": "cd ./src && ts-node ./index.ts",
+    "deploy-commands": "cd ./src && ts-node ./deploy-commands.ts",
     "compile": "tsc -p ."
   },
   "repository": {

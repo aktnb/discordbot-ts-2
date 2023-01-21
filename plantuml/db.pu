@@ -1,0 +1,37 @@
+@startuml erd
+title ER
+entity Member {
+  * memberId(pk)
+  --
+}
+entity VC {
+  * voicechannelId(pk)
+  --
+}
+entity Join {
+  * id(pk)
+  --
+  * voicechannelId(fk)
+  * memberId(fk)
+}
+entity PrivateChannel {
+  * id(pk)
+  --
+  * voicechannelId(fk)
+  roleId
+  textchannelId
+}
+entity NoticeSetting {
+  * id(pk)
+  --
+  * voicechannelId(fk)
+  * memberId(fk)
+  * all
+  * self
+}
+PrivateChannel ||--|| VC
+Join ||--|| Member
+Join }o--|| VC
+NoticeSetting }o--|| VC
+Member ||--o{ NoticeSetting
+@enduml
