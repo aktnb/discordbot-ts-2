@@ -1,7 +1,7 @@
 import fs from "fs";
 import { token, client } from "./bot-config.json";
 import { REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "discord.js";
-import { CommandHandler } from "./core";
+import { Command } from "./core";
 
 (async () =>{
   const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
@@ -10,8 +10,8 @@ import { CommandHandler } from "./core";
   
   await Promise.all(commandFiles.map((file) =>
       import(`./commands/${file}`)
-          .then(({ handler }: { handler: CommandHandler }) => {
-            commands.push(handler.data.toJSON());
+          .then(({ command }: { command: Command }) => {
+            commands.push(command.data.toJSON());
           })
   ));
 

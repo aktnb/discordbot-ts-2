@@ -3,35 +3,28 @@ title ER
 entity Member {
   * memberId(pk)
   --
+  voicechannelId(fk)
 }
 entity VC {
   * voicechannelId(pk)
   --
-}
-entity Join {
-  * id(pk)
-  --
-  * voicechannelId(fk)
-  * memberId(fk)
+  privateChannelId(fk)
 }
 entity PrivateChannel {
   * id(pk)
   --
-  * voicechannelId(fk)
   roleId
   textchannelId
 }
-entity NoticeSetting {
+entity BotMessage {
   * id(pk)
   --
-  * voicechannelId(fk)
-  * memberId(fk)
-  * all
-  * self
+  * key
+  content
+  file
+  enable
+  createrId(fk)
 }
 PrivateChannel ||--|| VC
-Join ||--|| Member
-Join }o--|| VC
-NoticeSetting }o--|| VC
-Member ||--o{ NoticeSetting
+Member }o--|| VC
 @enduml

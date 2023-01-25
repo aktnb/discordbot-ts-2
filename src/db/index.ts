@@ -1,48 +1,25 @@
 import { sequelize } from "./config";
+import { BotMessage } from "./BotMessage";
 import { Member } from "./Member";
-import { Join } from "./Join";
-import { NoticeSetting } from "./NoticeSetting";
 import { PrivateChannel } from "./PrivateChannel";
 import { VC } from "./VC";
 
 export const dbInit = async () => {
-  PrivateChannel.belongsTo(VC, {
+  Member.belongsTo(VC, {
     foreignKey: "voicechannelId",
-    targetKey: "voicechannelId"
+    targetKey: "voicechannelId",
+    onDelete: "SET NULL",
+    onUpdate: "CASCADE",
+    as: "voiceChannel",
   });
-  VC.hasOne(PrivateChannel, {
-    foreignKey: "voicechannelId"
+  PrivateChannel.hasOne(VC, {
+    foreignKey: "privatechannelId",
+    sourceKey: "id",
+    onDelete: "SET NULL",
+    onUpdate: "CASCADE",
+    as: "privateChannel",
   });
-  VC.hasMany(Join, {
-    foreignKey: "voicechannelId"
-  });
-  VC.hasMany(NoticeSetting, {
-    foreignKey: "voicechannelId"
-  });
-  Join.belongsTo(VC, {
-    foreignKey: "voicechannelId",
-    targetKey: "voicechannelId"
-  });
-  Join.belongsTo(Member, {
-    foreignKey: "memberId",
-    targetKey: "memberId"
-  });
-  NoticeSetting.belongsTo(VC, {
-    foreignKey: "voicechannelId",
-    targetKey: "voicechannelId"
-  });
-  NoticeSetting.belongsTo(Member, {
-    foreignKey: "memberId",
-    targetKey: "memberId"
-  });
-  Member.hasOne(Join, {
-    foreignKey: "memberId"
-  });
-  Member.hasMany(NoticeSetting, {
-    foreignKey: "memberId"
-  });
-
-  await sequelize.sync();
+  await sequelize.sync({ force: false });
 };
 
-export { sequelize, Member, Join, VC, NoticeSetting, PrivateChannel };
+export { sequelize, Member, VC, PrivateChannel, BotMessage };

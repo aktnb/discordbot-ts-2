@@ -11,11 +11,16 @@ export class EventListener {
   }
 }
 
-export class CommandHandler {
+export class Command {
   data: SlashCommandBuilder|SlashCommandSubcommandsOnlyBuilder|Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-  execute: (interaction: CommandInteraction) => Promise<void>;
-  constructor(data: SlashCommandBuilder|SlashCommandSubcommandsOnlyBuilder|Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, execute: (interaction: CommandInteraction) => Promise<void>) {
+  handler: (interaction: CommandInteraction) => Promise<void>;
+  /**
+   * 
+   * @param data 
+   * @param handler 
+   */
+  constructor(data: SlashCommandBuilder|SlashCommandSubcommandsOnlyBuilder|Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, handler: (interaction: CommandInteraction) => Promise<void>) {
     this.data = data;
-    this.execute = execute;
+    this.handler = handler;
   }
 }
