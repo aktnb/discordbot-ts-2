@@ -1,4 +1,4 @@
-import { Awaitable, ClientEvents, CommandInteraction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { Awaitable, CommandInteraction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export class EventListener {
   eventName: string;

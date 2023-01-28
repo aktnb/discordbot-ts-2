@@ -1,6 +1,6 @@
 import { BaseMessageOptions, Message } from "discord.js";
 import path from "path";
-import { KeyNotExitError } from "../botmessage/botmessage";
+import { KeyNotExitError } from "../boterror/boterrors";
 
 import { EventListener } from "../core";
 import { BotMessage, sequelize } from "../db";

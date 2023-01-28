@@ -21,10 +21,21 @@ entity BotMessage {
   --
   * key
   content
-  file
+  uri
   enable
   createrId(fk)
 }
+entity Reminder {
+  * id(pk)
+  --
+  * repeatType
+  * content
+  * uri
+  * channelId
+  * userId(fk)
+}
 PrivateChannel ||--|| VC
+BotMessage }o--|| Member
 Member }o--|| VC
+Reminder }o--|| Member
 @enduml

@@ -4,7 +4,7 @@ import { createWriteStream, unlink } from 'fs';
 import https from 'https';
 
 import { BotMessage, sequelize } from '../db';
-import { KeyAlreadyExistError } from '../botmessage/botmessage';
+import { KeyAlreadyExistError } from '../boterror/boterrors';
 import path from 'path';
 
 type Download = (url: string, filename: string) => Promise<void>;
@@ -35,6 +35,7 @@ const addBotMsg: AddBotMsg = async (key, content, attachment, creator) => {
         key: key,
         content: content,
         creatorId: creator.id,
+        enable: true,
       },
       transaction: t,
       lock: t.LOCK.NO_KEY_UPDATE
@@ -73,6 +74,7 @@ const delBotMsg: DelBotMsg = async (key, user) => {
       transaction: t,
       lock: t.LOCK.UPDATE,
     });
+    num += botmessages.length;
     for(const botmessage of botmessages) {
       if (botmessage.url) {
         const filepath = path.join("..", "attachments", botmessage.url);
