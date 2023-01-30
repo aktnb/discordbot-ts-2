@@ -3,7 +3,7 @@ import path from "path";
 import { KeyNotExitError } from "../boterror/boterrors";
 
 import { EventListener } from "../core";
-import { BotMessage, sequelize } from "../db";
+import { BotMessage, Message as MessageModel, sequelize } from "../db";
 
 type GetMsg = (key: string) => Promise<BaseMessageOptions|null>;
 
@@ -18,9 +18,11 @@ const getMsg: GetMsg = async (key: string) => {
       lock: t.LOCK.KEY_SHARE
     });
     if (!one) throw new KeyNotExitError(key);
+    const messageModel = await MessageModel.findByPk(one.messageId);
+    if (!messageModel) throw new KeyNotExitError(key);
     bmo = {
-      content: !!one.content ? one.content : undefined,
-      files: !!one.url ? [path.join("..", 'attachments', one.url)] : undefined,
+      content: !!messageModel.content ? messageModel.content : undefined,
+      files: !!messageModel.uri ? [path.join("..", 'attachments', messageModel.uri)] : undefined,
     };
   });
   return bmo;

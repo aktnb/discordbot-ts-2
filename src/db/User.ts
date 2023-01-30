@@ -1,28 +1,29 @@
 import { InferAttributes, InferCreationAttributes, DataTypes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "./config";
 
-class VC extends Model<InferAttributes<VC>, InferCreationAttributes<VC>> {
-  declare voicechannelId: string;
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  declare userId: string;
   declare privatechannelId: CreationOptional<number|null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-VC.init({
-  voicechannelId: {
+User.init({
+  userId: {
     type: DataTypes.STRING(24),
     primaryKey: true
   },
   privatechannelId: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: null
   },
   createdAt: DataTypes.DATE,
   updatedAt: DataTypes.DATE,
 }, {
   sequelize,
-  tableName: "vcs",
+  tableName: "users",
   version: true,
 });
 
-export { VC };
+export { User };

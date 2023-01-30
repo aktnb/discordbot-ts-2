@@ -1,25 +1,47 @@
 import { sequelize } from "./config";
 import { BotMessage } from "./BotMessage";
-import { Member } from "./Member";
+import { User } from "./User";
+import { Reminder } from "./Reminder";
 import { PrivateChannel } from "./PrivateChannel";
-import { VC } from "./VC";
+import { Message } from "./Message";
 
 export const dbInit = async () => {
-  Member.belongsTo(VC, {
-    foreignKey: "voicechannelId",
-    targetKey: "voicechannelId",
-    onDelete: "SET NULL",
-    onUpdate: "CASCADE",
-    as: "voiceChannel",
-  });
-  PrivateChannel.hasOne(VC, {
+  User.belongsTo(PrivateChannel, {
     foreignKey: "privatechannelId",
-    sourceKey: "id",
+    targetKey: "id",
     onDelete: "SET NULL",
     onUpdate: "CASCADE",
-    as: "privateChannel",
+    as: "PrivateChannel"
   });
-  await sequelize.sync({ force: false });
+  Reminder.belongsTo(User, {
+    foreignKey: "userId",
+    targetKey: "userId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    as: "User"
+  });
+  BotMessage.belongsTo(User, {
+    foreignKey: "creatorId",
+    targetKey: "userId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    as: "Creator"
+  });
+  Reminder.belongsTo(Message, {
+    foreignKey: "messageId",
+    targetKey: "id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    as: "Message"
+  });
+  BotMessage.belongsTo(Message, {
+    foreignKey: "messageId",
+    targetKey: "id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    as: "Message"
+  });
+  await sequelize.sync({ force: true });
 };
 
-export { sequelize, Member, VC, PrivateChannel, BotMessage };
+export { sequelize, User, Message, Reminder, PrivateChannel, BotMessage };

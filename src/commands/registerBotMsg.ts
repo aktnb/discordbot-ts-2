@@ -3,7 +3,7 @@ import { Command } from '../core';
 import { createWriteStream, unlink } from 'fs';
 import https from 'https';
 
-import { BotMessage, sequelize } from '../db';
+import { BotMessage, sequelize, Message as MessageModel, User as UserModel } from '../db';
 import { KeyAlreadyExistError } from '../boterror/boterrors';
 import path from 'path';
 
@@ -27,23 +27,27 @@ const download: Download = async (url, filename) => {
 
 const addBotMsg: AddBotMsg = async (key, content, attachment, creator) => {
   await sequelize.transaction(async t => {
-    const [botmessage, _isNew] = await BotMessage.findOrCreate({
-      where: {
-        key: key,
-      },
-      defaults: {
-        key: key,
-        content: content,
-        creatorId: creator.id,
-        enable: true,
-      },
-      transaction: t,
-      lock: t.LOCK.NO_KEY_UPDATE
-    });
-    if (!_isNew) {
+    const one = await BotMessage.findOne({ where: { key: key }, transaction: t, lock: t.LOCK.KEY_SHARE });
+    if (one) {
+      //  keyが使われている場合
       throw new KeyAlreadyExistError(key);
     }
+    //  作成者
+    const [userModel, _isNew] = await UserModel.findOrCreate({
+      where: {
+        userId: creator.id, 
+      },
+      defaults: {
+        userId: creator.id,
+        privatechannelId: null,
+      },
+      transaction: t,
+      lock: t.LOCK.UPDATE
+    });
+    //  メッセージ
+    const messageModel = await MessageModel.create();
     if (attachment) {
+      //  画像情報
       let extension = "";
       if (attachment.contentType == "image/png") {
         extension = "png";
@@ -53,13 +57,25 @@ const addBotMsg: AddBotMsg = async (key, content, attachment, creator) => {
         throw new TypeError();
       }
       await download(attachment.url, path.join("..", "attachments", attachment.id + "." + extension));
-      await botmessage.update({
-        key: key,
-        url: attachment.id + "." + extension,
-        enable: true, 
+      await messageModel.update({
+        uri: attachment.id + "." + extension,
       }, { transaction: t });
-      console.log(`registered ${key}`);
     }
+    if (content) {
+      //  テキスト
+      await messageModel.update({
+        content: content
+      }, { transaction: t });
+    }
+    //  ボットメッセージ
+    await BotMessage.create(
+      {
+        key: key,
+        messageId: messageModel.id,
+        enable: true,
+        creatorId: userModel.userId
+      }, { transaction: t }
+    );
   });
 } 
 
@@ -76,13 +92,16 @@ const delBotMsg: DelBotMsg = async (key, user) => {
     });
     num += botmessages.length;
     for(const botmessage of botmessages) {
-      if (botmessage.url) {
-        const filepath = path.join("..", "attachments", botmessage.url);
+      const messageModel = await MessageModel.findByPk(botmessage.messageId);
+      if (messageModel?.uri) {
+        //  画像削除
+        const filepath = path.join("..", "attachments", messageModel.uri);
         unlink(filepath, err => {
           if (err) throw err;
           console.log(`deleted ${filepath}`); 
         });
       }
+      await messageModel?.destroy({ transaction: t });
       await botmessage.destroy({ transaction: t });
     }
   });

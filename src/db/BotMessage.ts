@@ -4,8 +4,7 @@ import { sequelize } from "./config";
 class BotMessage extends Model<InferAttributes<BotMessage>, InferCreationAttributes<BotMessage>> {
   declare id: CreationOptional<number>;
   declare key: string;
-  declare content: CreationOptional<string|null>;
-  declare url: CreationOptional<string|null>;
+  declare messageId: number;
   declare enable: CreationOptional<boolean>;
   declare creatorId: string;
   declare createdAt: CreationOptional<Date>;
@@ -22,13 +21,9 @@ BotMessage.init({
     type: DataTypes.TEXT,
     allowNull: false
   },
-  content: {
-    type: DataTypes.TEXT,
-    defaultValue: null,
-  },
-  url: {
-    type: DataTypes.TEXT,
-    defaultValue: null,
+  messageId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   enable: {
     type: DataTypes.BOOLEAN,

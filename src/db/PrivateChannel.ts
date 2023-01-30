@@ -3,7 +3,7 @@ import { sequelize } from "./config";
 
 class PrivateChannel extends Model<InferAttributes<PrivateChannel>, InferCreationAttributes<PrivateChannel>> {
   declare id: CreationOptional<number>;
-  declare once: CreationOptional<boolean>;
+  declare permanent: CreationOptional<boolean>;
   declare roleId: string|null;
   declare textchannelId: string|null;
   declare createdAt: CreationOptional<Date>;
@@ -16,9 +16,9 @@ PrivateChannel.init({
     autoIncrement: true,
     primaryKey: true,
   },
-  once: {
+  permanent: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    defaultValue: false,
   },
   roleId: {
     type: DataTypes.STRING(24),

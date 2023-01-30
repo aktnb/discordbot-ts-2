@@ -1,18 +1,15 @@
 @startuml erd
 title ER
-entity Member {
-  * memberId(pk)
+entity User {
+  * userId(pk)
   --
-  voicechannelId(fk)
-}
-entity VC {
-  * voicechannelId(pk)
-  --
-  privateChannelId(fk)
+  privatechannelId(fk)
 }
 entity PrivateChannel {
   * id(pk)
   --
+  * permanent
+  * voicechannelId
   roleId
   textchannelId
 }
@@ -20,22 +17,28 @@ entity BotMessage {
   * id(pk)
   --
   * key
-  content
+  * messageId(fk)
+  * enable
+  * createrId(fk)
+}
+entity Message {
+  * id(pk)
+  --
   uri
-  enable
-  createrId(fk)
+  content
 }
 entity Reminder {
   * id(pk)
   --
-  * repeatType
-  * content
-  * uri
+  * interval
+  * triggerAt
+  * messageId(fk)
   * channelId
   * userId(fk)
 }
-PrivateChannel ||--|| VC
-BotMessage }o--|| Member
-Member }o--|| VC
-Reminder }o--|| Member
+BotMessage }o--|| User
+User }o--|| PrivateChannel
+Reminder }o--|| User
+Message ||--|| Reminder
+Message ||--|| BotMessage
 @enduml
